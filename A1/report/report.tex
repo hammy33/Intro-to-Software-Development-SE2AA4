@@ -1,0 +1,157 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\usepackage{paralist}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\oddsidemargin 0mm
+\evensidemargin 0mm
+\textwidth 160mm
+\textheight 200mm
+
+\pagestyle {plain}
+\pagenumbering{arabic}
+
+\newcounter{stepnum}
+
+\title{Assignment 1}
+\author{Hamrish Saravanakumar, saravah}
+\date{January 28, 2021}
+
+\begin {document}
+
+\maketitle
+
+This report discusses testing of the \verb|ComplexT| and \verb|TriangleT|
+classes written for Assignment 1. It also discusses testing of the partner's
+version of the two classes. The design restrictions for the assignment
+are critiqued and then various related discussion questions are answered.
+
+\section{Assumptions and Exceptions} \label{AssumptAndExcept}
+
+\noindent Assumptions were made based on a method’s behaviour for specific cases that were not specified completely in the assignment’s specifications. Specifically, it was assumed that:
+\begin{itemize}
+	\item \verb |ComplexT| and \verb |TriangleT| can only take inputs of type “int” or “float”.
+	\item Since the assignment specifications state that TriangleT only takes inputs of type “int”,  inputs of type “float” would be considered an invalid triangle.
+	\item \verb |tri_type|: A triangle that can be classified as both a right-angled triangle and another type of triangle, would be considered as a right-angled triangle. This is because the method should return an output of \verb |TriType|, which means only a singular element of the set of triangles types should be returned. 
+\end{itemize}
+
+~\newline\noindent In addition, I decided to return None when the input should be undefined instead of assuming that these inputs would not be used, including:
+\begin{itemize}
+	\item \verb |get_phi|: The argument of a complex number is undefined if both the real and imaginary numbers are equal to zero.
+	\item \verb |recip|: The reciprocal of a complex number is undefined if the real and imaginary numbers are equal to zero.
+	\item \verb |div|: The quotient of an argument complex number divided by the initial complex number is undefined if the real and imaginary parts of the argument complex number are equal to zero.
+\end{itemize}
+
+~\newline\noindent Finally, I decided to return None when there should not be an output if the input does not match the specifications of the assignments, including:
+\begin{itemize}
+	\item \verb |get_sides|: An invalid triangle does not technically have 3 side lengths, so the method returns None
+	\item \verb |__eq__|: This method in \verb |triangle_adt.py| should only compare two valid triangles in order to determine if they are equal. If either the argument triangle or current triangle is invalid, the method returns None as a result
+	\item \verb |perim|: An invalid triangle does not have a perimeter, so the method returns None
+	\item \verb |area|: An invalid triangle does not have an area, so the method returns None
+	\item \verb |tri_type|: An invalid triangle can not be categorized to have a specific type, so the method returns None 
+\end{itemize}
+
+~\newline\noindent Exceptions were not thrown, as every reasonable case for both programs was accounted for through returning None for all undefined and invalid cases.
+
+\section{Test Cases and Rationale} \label{Testing}
+
+Tests were written to prove that each individual method from both \verb |complex_adt.py| and \verb |triangle_adt.py| would handle regular, edge, and invalid cases. This was done by defining variables of type \verb |ComplexT| and \verb |TriangleT| that would be used for the test cases. 
+
+~\newline\noindent For each method, a variable is defined to represent if my method returns the correct value. This correct value was either calculated or determined by using online calculators that were cited in the details of both python modules, referencing Wikepedia articles that were also cited, or using \verb |cmath| to calculate certain properties for \verb |complex_adt.py|. For example, if \verb |complex1.get_phi| returns the same value as \verb |cmath.phase(x)|, where \verb |x| represents complex1 in the form \verb |a + bj| instead of as type \verb |ComplexT|, then the variable \verb |get_phiTest1| is equal to \verb |True|. If not, the variable would have been equal to \verb |False|. 
+
+\newpage
+
+~\newline\noindent Once all tests for a particular method have been conducted, a for loop is used to iterate through a list that contains the results of all of the test cases. For every test case in the list that has a value of True, a statement is printed to indicate that the test does in fact pass. On the other hand, a statement to indicate that the test fails is printed for every case with a value of False.  Finally, to improve readability, a final statement is printed to show how many cases passed for that particular method out of the total number of cases conducted.
+
+~\newline\noindent For every method, there would always be one test case for inputs that the method would expect, based on the assignment’s specification. However, in order to further prove the functionality and usability of both programs, edge cases were included that would require special handling as a means of testing the boundaries of the program. For example, the variable \verb |complex1| represents a complex number of type \verb |ComplexT| with inputs 1.0 and 2.0, and is used in every method for \verb |complex_adt.py| to represent the expected case. On the other hand, the variable \verb |complex4| represents a complex number of type \verb |ComplexT| with inputs 0.0 and 0.0, and is used in every method for \verb |complex_adt.py| to represent edge cases that often return None based on the properties of many of the calculations including the \verb |div|, \verb |recip|, and \verb |get_phi methods|. Instead of only including one test case to represent edge cases, I ensured to include multiple test cases that would prove the adaptability of the program to handle various boundary conditions. 
+
+\newpage
+
+\section{Results of Testing Partner's Code}
+
+In order to test my partner’s \verb |complex_adt.py| and \verb |triangle_adt.py| files, I copied my \verb |test_driver.py| file into the partner folder temporarily and ran the test driver. 
+
+~\newline\noindent After running the driver for the first time, the code passes all of the test cases for the first 5 test methods other than 2 cases in the \verb |get_phi| method, fails all of the cases for the next 4 methods, and then terminates with the error “Zero Division Error: float division by zero”. In order to get results for all cases for the \verb |complex_adt.py| module, I temporarily deleted \verb |recipTest3| and \verb |divTest2|. The code failed all remaining cases for the \verb |ComplexT| class. Before examining the code itself, it is important to note of the assumptions made by my partner. An assumption that the methods will only ever interact with a nonzero complex number of type \verb |ComplexT|. This explains the “Zero division error”, for both \verb |recipTest3| and \verb |divTest2| , as my code did not make this assumption, and I instead returned None under these conditions. This is also why two of the test cases in \verb |get_phi| failed. However, none of these assumptions explain the failed cases for the remaining methods. I went into the python file itself and decided return the value of each method to determine where the differences lied. An example of what I ran at first for the \verb |recip| method is \verb |print(complex1.recip())|. The value that was returned for each of these cases were a variation of the following: \verb |<__main__.ComplexT object at 0x000001BFD27EAD00>|. This was expected, as this is the way that the computer processes the object. To get a more comprehendible number, I ran \verb |print(complex1.recip().real())| and \verb |print(complex1.recip().imag())|. I was surprised to see that for all cases they are not supposed to return None, the real and imaginary parts of the returned complex number were the same, suggesting that all of the test cases for the \verb |ComplexT| class technically passed as a result of the assumptions made by the partner. It may have been more effective to compare the real and imaginary parts of the object rather than comparing the object itself for the test cases, in order to ensure the driver would be compatible with different python modules.
+
+\newpage 
+
+~\newline\noindent Moving on to the \verb |TriangleT| class, the first run of \verb |test_driver.py| returned only 1 out of 3 passed cases for the \verb |get_sides| and \verb |perim| tests, 3 out of 4 passed cases for the \verb |equal| tests, and then terminates with the error “Value Error: math domain error”. In order to get results for all cases for the \verb |triangle_adt.py| module, I temporarily deleted \verb |areaTest3|. For the remaining three methods that were tested, only one test case for each method failed. Similar to \verb |complex_adt.py|, I examined the assumptions made before critiquing the results of the test cases. It was assumed that all functions are passed by the correct data type of parameters, which assumes that only integers are passed as the side lengths. This explains why the code fails for any tests involving \verb |triangle2|, as this triangle of type \verb |TriangleT| represents an edge case that uses side length values of type float. The issue with the \verb |TriangleT class|, is that if a triangle returns False after running the \verb |is_valid| method, it is still allowed to be constructed and run as if it was a perfectly valid triangle. This is why the rest of the test cases failed. For example, for \verb |triangle5|, that represents an edge case where all of the side lengths of the triangle are 0, the test cases expect the value None for methods \verb |area|, \verb |perim|, \verb |equal|, and \verb |tri_type| because an invalid triangle can not have characteristics of a geometrically valid triangle. There should have been an effort to either ensure that an invalid triangle did not get constructed, or so that an error is raised when an invalid triangle is attempted to be passed in one of the other methods in the \verb |TriangleT| class.
+
+\section{Critique of Given Design Specification}
+
+~\newline\noindent One particular strength of the design is specifying the types of inputs chosen to represent the data of either module, such as representing the real and imaginary numbers of a complex number as a float, and the different side lengths of a triangle as an integer. Specifically in the \verb |ComplexT| class, having two separate variables to represent the real and imaginary numbers allowed for quick and easy retrieval of these values, and the ability to utilize these values in the methods that require calculations using both variables. Additionally, the specifications of the state variables that were chosen to represent the identity of the complex number and triangle were effective, and provided students with an efficient way to use these values for the various methods within each class.
+
+\newpage 
+
+~\newline\noindent Both classes themselves had a large number of methods that represented the well-versed properties of both complex numbers and triangles. The \verb |is_valid| method in the \verb |TriangleT| class was especially useful, especially for those making the assumption that an invalid triangle should have invalid outputs for the remaining methods in the class. Rather than having to check if the triangle was invalid in every individual method, the \verb |is_valid| method was ran, and the output passed None if the \verb |is_valid| method was False. This significantly improved the efficiency of the code written for the \verb |TriangleT| class. 
+
+~\newline\noindent A major drawback to this design, as shown through the multiple assumptions made in Section \ref{AssumptAndExcept}, is the number of ambiguities that were present. This was a result of writing the specifications in natural language. Specifically, there was very little instruction on how to handle instances in the program that would have an undefined output. An example of this can be found in the \verb |recip| method, where a zero complex number would return an undefined output due to a “division by zero” error. Students could have handled these occurrences in multiple ways. An exception could have been raised to catch a particular error that would be expected based on the passed inputs, an assumption could have been stated to indicate that inputs that would cause for an undefined output would never be passed, or these cases could be formatted to return None. The preferred method for handling such cases should have been stated, as this proved problematic during the testing of the partner’s code, especially when the partner made different assumptions in comparison to the student themselves.
+
+\section{Answers to Questions}
+
+\begin{enumerate}[(a)]
+
+\item There are no mutators because according to the assignment specification, there are no methods that modify the state of the variable of the object itself. A getter method is one that does not change the state variables and returns a value based on that variable. This would include methods that simply returns a value of one of the variables without making any calculations. These would include \verb |real| and \verb |imag| methods from the \verb |ComplexT| class, and the \verb |get_sides| method from the \verb |TriangleT| class. A getter method would also include those methods that use variables to calculate a value to be returned, without modifying the state of the variables. These would include \verb |get_phi|, \verb |get_r|, \verb |conj|, \verb |recip|, and \verb |sqrt| methods from the \verb |ComplexT| class, and the \verb |perim|, \verb |area|, and \verb |tri_type| methods from the \verb |TriangleT| class.
+
+\newpage 
+
+\item State variables, otherwise known as instance variables, are the variables that are passed through the constructor in a particular class. In the current implementations as defined by the assignment specifications, the state variables for \verb |ComplexT| are two variables that represent the real and imaginary parts of a complex number, and the state variables for \verb |TriangleT| are three variables that represent each unique side length of a triangle. The state variables for \verb |ComplexT| could have been represented as a list, where the first number represents the real part of the complex number, and the second represents the imaginary part. The state variables for \verb |TriangleT| could have been represented as a list as well, where each member of the list represents a side length of the triangle. Using lists as variables would not have been as effective, as many of the methods required calculations based on the state variables, and it would have been less efficient to have to call on members of a list to have to perform these calculations. 
+
+\item Given two complex numbers, it is impossible to determine which of the two is either greater or less than the other, based on their real and imaginary parts alone. This is because complex numbers are not simply an integer or a float, but instead, a set of complex numbers form a field, but not necessarily an ordered field. This is why an equal method is the only appropriate method that can be included in class \verb |ComplexT| when comparing the complex numbers alone. Instead, the magnitude of 2 complex numbers can be compared to determine the greater/smaller of the two, as the magnitude is represented by an integer, as shown in the \verb |get_r| method. 
+
+\item There are certain conditions that determine whether three side lengths of particular lengths are able to form a geometrically valid triangle. The approach is that a triangle is valid if the sum of two of the sides is greater than the third sides. These conditions were used to create the \verb |is_valid| method. There were no specific instructions regarding invalid triangles and their behaviour when passed through the other methods in \verb |TriangleT|. However, I decided to return None for all remaining methods in \verb |TriangleT| if an invalid triangle is given. This is because, if a triangle is not geometrically valid, it is not technically a triangle in the first place. Therefore, a triangle with such properties should not have an area, a perimeter, a triangle type, nor should it be comparable to another valid triangle. 
+
+\newpage 
+
+\item The type of triangle is based on the behaviour of the three side lengths of the triangle. Therefore, the user will most likely be forced to determine the triangle type on their own. The point of the ADT class of \verb |TriangleT| is to return various different characteristics based purely on the state variables, which are the different side lengths. It would be far more useful to implement a method to determine the type of triangle, as done through the \verb |tri_type| method. The only situation where a state variable for the triangle type would be appropriate, is if there were methods that would actually require the type of a triangle in order to return a particular value. A potential example of this would be a \verb |get_hypotenuse| method that would return the hypotenuse of a triangle. The method could take advantage of a state variable for the triangle type, and will only return the largest side length if the passed triangle is a “right-angled” triangle.
+
+\item Performance of a product is heavily reliant on the external quality requirements for both speed and storage, whereas the usability of a software product refers to the ease with which a user is able to use that particular product. If a product has poor performance, this often adversely affects the usability and the scalability of the product. For example, if a product is poor as a result of slow speed and low storage, a user will have difficulties being able to use that particular product for their needs.
+
+\item A rational development process was introduced by Parnas and Clements to provide meaning to the ideal process in which programs are derived from its requirements. Despite claiming that a rational design process is needed in order to produce quality software, it is argued that it is impossible to find a process in which the software is designed in a perfectly rational way. Instead, it is suggested to fake this process, by presenting the system and its associated documents to others as if the user had followed this particular idealized design process. Although upholding this software best practice is in the interest of the user more often than not, I can propose one situation where this design process may not have to be faked. For example, let us say an individual were to document their design process as it happens, without correcting for human errors and including everything that happens from the start of the design process all the way until creation. This would be impactful as a student when submitting an assignment, to show the learning process that the student went through during the process of the assignment. “Faking” this process could be seen as an example of academic dishonesty, and the student should instead be authentic with all the steps they took, regardless of whether they were correct or not. However, in the production world where documentation is crucial for others to interpret a particular software practice, it is important to present this in the most rational way possible.
+
+\newpage 
+
+\item A software product is re-usable if it can be used to create a new product and is reliable if it is able to carry out the function that it is intended to perform on a regular basis. By designing software products that prioritize reusability ensure that they are more durable and easier to maintain. These directly impact the overall quality of the product, and thus the reliability that users experience when using the product. A reason why this is the case, is because software reusability minimizes the need to use newly developed products, eliminating the risk of issues that may arise with a new product.
+
+\item Hardware abstractions are defined as specific sets of routines in software, that provide programs with access to hardware resources. This is usually done through a programming interface, which allows devices in a particular class of hardware devices to be accessed through identical interfaces. Specifically, high level programming languages include many built-in abstractions that make it easier for the user to focus on the problem that is aimed to be solve by using that programming language, rather than worrying about how the computer hardware works in the background. High-level languages, such as Scheme and Snap! are often used to produce programs that are less likely to have bugs in memory use and can improve conveniency to allow for shorter and cleaner code. 
+
+\end{enumerate}
+
+\newpage
+
+\lstset{language=Python, basicstyle=\tiny, breaklines=true, showspaces=false,
+  showstringspaces=false, breakatwhitespace=true}
+%\lstset{language=C,linewidth=.94\textwidth,xleftmargin=1.1cm}
+
+\def\thesection{\Alph{section}}
+
+\section{Code for complex\_adt.py}
+
+\noindent \lstinputlisting{../src/complex_adt.py}
+
+\newpage
+
+\section{Code for triangle\_adt.py}
+
+\noindent \lstinputlisting{../src/triangle_adt.py}
+
+\newpage
+
+\section{Code for test\_driver.py}
+
+\noindent \lstinputlisting{../src/test_driver.py}
+
+\newpage
+
+\section{Code for Partner's complex\_adt.py}
+
+\noindent \lstinputlisting{../partner/complex_adt.py}
+
+\section{Code for Partner's triangle\_adt.py}
+
+\noindent \lstinputlisting{../partner/triangle_adt.py}
+
+\end {document}
